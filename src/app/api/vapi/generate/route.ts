@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { generateText } from "ai";
 import { google } from "@/lib/gemini";
+import { db } from "@/firebase/admin";
 
 export async function POST(req: Request) {
   try {
@@ -31,6 +32,21 @@ export async function POST(req: Request) {
     });
 
     const questions = JSON.parse(ques);
+
+    const interview = {
+      role: role,
+      type: type,
+      level: level,
+      techstack: techstack,
+      questions: questions,
+      amount: amount,
+      // userId: userid,
+      finalized: true,
+      // coverImage: getRandomInterviewCover(),
+      createdAt: new Date().toISOString(),
+    };
+
+    await db.collection("interviews").add(interview);
 
     return NextResponse.json({ success: true, questions });
   } catch (error) {
